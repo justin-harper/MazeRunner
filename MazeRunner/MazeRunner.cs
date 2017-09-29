@@ -24,6 +24,15 @@ namespace MazeRunner
 
         }
 
+        public void WriteOutMazeFile(string path)
+        {
+            using (StreamWriter sw = new StreamWriter(File.Open(path, FileMode.Create, FileAccess.Write)))
+            {
+                sw.Write($"{ToString()}");
+                sw.Close();
+            }
+        }
+
         public void ReadInMazeFile(string path)
         {
             using (StreamReader sr = new StreamReader(File.Open(path, FileMode.Open, FileAccess.Read)))
@@ -88,6 +97,10 @@ namespace MazeRunner
             while (UnvisitedQueue.Count > 0 && Victory == false)
             {
                 Current = UnvisitedQueue.Dequeue();
+                //if (Current == null)
+                //{
+                //    break;
+                //}
                 MazeChars[Current.X][Current.Y] = 'V';
                 if (AddNorth(Current))
                 {
@@ -116,7 +129,7 @@ namespace MazeRunner
 
         private bool AddWest(Location current)
         {
-            if (current.X < MazeChars[current.X].Length)
+            if (current.X < MazeChars[current.X].Length - 1)
             {
                 if (MazeChars[current.X + 1][current.Y] == 'G')
                 {
@@ -133,7 +146,7 @@ namespace MazeRunner
 
         private bool AddSouth(Location current)
         {
-            if (current.Y < MazeChars.Length)
+            if (current.Y < MazeChars.Length - 1)
             {
                 if (MazeChars[current.X][current.Y + 1] == 'G')
                 {
@@ -254,19 +267,39 @@ namespace MazeRunner
         {
             //Front doesn't move
             //Back moves to the new node
-            if (Front == null)
-            {
-                Front = new Node(value);
-                Back = Front;
 
+            Node t = new Node(value);
+
+            if (Count == 0)
+            {
+                Front = t;
+                Back = t;
+                Count++;
+                return;
             }
             else
             {
-                Node t = new Node(value) {Next = Back};
+                Back.Next = t;
                 Back = t;
+                Count++;
+                return;
             }
 
-            Count++;
+
+
+            //if (Front == null)
+            //{
+            //    Front = new Node(value);
+            //    Back = Front;
+
+            //}
+            //else
+            //{
+            //    Node t = new Node(value) {Next = Back};
+            //    Back = t;
+            //}
+
+            //Count++;
         }
 
         public T Dequeue()
@@ -274,22 +307,22 @@ namespace MazeRunner
             //Front moves to the next Node in line
             //Back doesn't move unless back and front point to the same Node
 
-            if (Front == null)
+            if (Count == 0)
             {
-                throw new Exception("Queue was Empty");
-            }
-            Node f = Front;
-            if (ReferenceEquals(f, Back))
-            {
-                Back = Front = null;
+                return default(T);
             }
             else
             {
+                T x = Front.Value;
                 Front = Front.Next;
+                Count--;
+                if (Count == 0)
+                {
+                    Back = null;
+                }
+                return x;
             }
 
-            Count--;
-            return f.Value;
         }
 
     }

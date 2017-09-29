@@ -17,6 +17,15 @@ namespace MazeRunner
             PrintMaze(mr);
             mr.FindGoal();
             PrintMaze(mr);
+            string outP = GetOutputFileLocation();
+            mr.WriteOutMazeFile(outP);
+        }
+
+        private static string GetOutputFileLocation()
+        {
+            Console.WriteLine("Please give me the location of the Output File");
+            string path = Console.ReadLine();
+            return path;
         }
 
         private static void PrintMaze(MazeRunner mr)
